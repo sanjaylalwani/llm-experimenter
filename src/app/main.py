@@ -1,10 +1,15 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from history_manager import HistoryManager
 from datetime import datetime
 from openai import OpenAI
+
 from utils import SessionManager
+from history_manager import HistoryManager
+from configurations.settings import Settings
+
+settings = Settings()
+model_config = settings.model_config
 
 
 # Initialize SessionManager
@@ -52,9 +57,12 @@ with st.sidebar:
 if st.session_state.user:
 
     # Model selection
-    st.selectbox("Select OpenAI model:",
-                 options=["gpt-3.5-turbo", "gpt-4o"],
-                 key="selected_model")
+    openai_models = model_config.get("openai", [])
+    st.selectbox("Select OpenAI model:", options=openai_models, key="selected_model")
+
+    # st.selectbox("Select OpenAI model:",
+    #              options=["gpt-3.5-turbo", "gpt-4o"],
+    #              key="selected_model")
 
     # Display chat history
     for chat in st.session_state.chat_history:
