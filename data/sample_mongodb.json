@@ -1,0 +1,8 @@
+{
+  "user": "sanjay@example.com",
+  "session_id": "12345abcde",
+  "model": "gpt-3.5-turbo",
+  "prompt": "Explain LLM in simple terms.",
+  "response": "LLM stands for large language model...",
+  "timestamp": "2025-06-30T20:35:00Z"
+}
