@@ -4,7 +4,7 @@ import os
 
 class HistoryManager:
     def __init__(self, uri=None, db_name="llmExperimenter", collection_name="history"):
-        self.mongo_uri = "mongodb+srv://sanjaylalwani3:gawz8PFD5H8Id2wS@userdb.piorfp7.mongodb.net/" #uri or os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        self.mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
         self.db_name = db_name
         self.collection_name = collection_name
         self.client = None
