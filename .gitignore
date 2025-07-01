@@ -1,2 +1,3 @@
 src/.env
 src/app/__pycache__/history_manager.cpython-312.pyc
+src/app/__pycache__/utils.cpython-312.pyc
