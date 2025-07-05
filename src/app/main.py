@@ -1,8 +1,12 @@
+import sys
 import streamlit as st
 import os
 from dotenv import load_dotenv
 from datetime import datetime
 from openai import OpenAI
+
+# Append project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import SessionManager
 from history_manager import HistoryManager

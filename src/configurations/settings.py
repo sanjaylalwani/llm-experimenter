@@ -3,9 +3,14 @@ import yaml
 from pathlib import Path
 
 class Settings:
-    def __init__(self, model_file="models.yml"):
-        self.model_config_path = Path(model_file)
-        self.model_config = self._load_model_config()
+    def __init__(self):
+        # Get the directory where the script is located
+        base_dir = Path(__file__).parent
+
+        # Build the full path to your YAML file
+        file_path = base_dir / 'models.yml'
+        with open(file_path, "r") as f:
+            self.model_config =  yaml.safe_load(f)
 
     def _load_model_config(self):
         if not self.model_config_path.exists():
