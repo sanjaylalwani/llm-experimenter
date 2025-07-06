@@ -10,6 +10,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import SessionManager
 from history_manager import HistoryManager
+from user_configuration_manager import get_user_config
+
 from configurations.settings import Settings
 
 settings = Settings()
@@ -33,6 +35,10 @@ client = OpenAI(
     # This is the default and can be omitted
     api_key=os.getenv("OPENAI_API_KEY"),
 )
+
+
+
+
 
 # Streamlit Page Config
 st.set_page_config(page_title="LLM Experimenter", layout="centered")
@@ -60,13 +66,18 @@ with st.sidebar:
 # App Body
 if st.session_state.user:
 
-    # Model selection
-    openai_models = model_config.get("openai", [])
-    st.selectbox("Select OpenAI model:", options=openai_models, key="selected_model")
+    user_defaults = get_user_config(st.session_state.user, fallback=settings.defaults)
 
-    # st.selectbox("Select OpenAI model:",
-    #              options=["gpt-3.5-turbo", "gpt-4o"],
-    #              key="selected_model")
+    with st.expander("⚙️ Advanced Parameters", expanded=False):
+        temperature = st.slider("Temperature", 0.0, 1.0, user_defaults["temperature"], step=0.05)
+        max_tokens = st.number_input("Max Tokens", 10, 4096, user_defaults["max_tokens"], step=10)
+        top_p = st.slider("Top-p", 0.0, 1.0, user_defaults["top_p"], step=0.05)
+        presence_penalty = st.slider("Presence Penalty", -2.0, 2.0, user_defaults["presence_penalty"], step=0.1)
+        frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1)
+
+    # Model selection
+    openai_models = model_config.get("", [])
+    st.selectbox("Select Generative AI model:", options=openai_models, key="selected_model")
 
     # Display chat history
     for chat in st.session_state.chat_history:
@@ -87,7 +98,11 @@ if st.session_state.user:
                 response = client.chat.completions.create(
                     model=st.session_state.selected_model,
                     messages=st.session_state.chat_history,
-                    temperature=0.7
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    top_p=top_p,
+                    presence_penalty=presence_penalty,
+                    frequency_penalty=frequency_penalty
                 )
                 answer = response.choices[0].message.content
 
@@ -108,13 +123,11 @@ if st.session_state.user:
             st.error(f"Error: {e}")
 
     # Show past saved interactions
-    with st.expander("📜 View Previous 5 Interactions"):
-        saved_history = history_manager.get_history(st.session_state.user, limit=5)
+    with st.expander("📜 View Previous 10 Interactions"):
+        saved_history = history_manager.get_history(st.session_state.user, limit=10)
         for item in saved_history:
             st.markdown(f"🕒 `{item['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}` | **{item['model']}**")
             st.markdown(f"- **Prompt:** {item['prompt']}")
             st.markdown(f"- **Response:** {item['response']}")
-            st.markdown("---")
-
 else:
     st.info("Please login using the sidebar to start chatting.")

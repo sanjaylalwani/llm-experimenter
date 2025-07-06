@@ -11,6 +11,13 @@ class Settings:
         file_path = base_dir / 'models.yml'
         with open(file_path, "r") as f:
             self.model_config =  yaml.safe_load(f)
+        self.defaults = self.model_config.get("defaults", {
+            "temperature": 0.7,
+            "max_tokens": 512,
+            "top_p": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0
+        })
 
     def _load_model_config(self):
         if not self.model_config_path.exists():

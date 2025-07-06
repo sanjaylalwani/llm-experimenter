@@ -3,3 +3,4 @@ src/app/__pycache__/history_manager.cpython-312.pyc
 src/app/__pycache__/utils.cpython-312.pyc
 src/configurations/__pycache__/__init__.cpython-312.pyc
 src/configurations/__pycache__/settings.cpython-312.pyc
+*.pyc
