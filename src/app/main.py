@@ -3,7 +3,6 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from datetime import datetime
-from openai import OpenAI
 
 # Append project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -12,8 +11,9 @@ from utils import SessionManager
 from history_manager import HistoryManager
 from user_configuration_manager import get_user_config
 
+from app.llms.openai_class import OpenAIClient
+                
 from configurations.settings import Settings
-
 settings = Settings()
 model_config = settings.model_config
 
@@ -30,15 +30,6 @@ history_manager = HistoryManager()
 
 # Load environment variables
 load_dotenv()
-# openai.api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.getenv("OPENAI_API_KEY"),
-)
-
-
-
-
 
 # Streamlit Page Config
 st.set_page_config(page_title="LLM Experimenter", layout="centered")
@@ -95,15 +86,17 @@ if st.session_state.user:
         # Call OpenAI API
         try:
             with st.spinner("Thinking..."):
-                response = client.chat.completions.create(
-                    model=st.session_state.selected_model,
-                    messages=st.session_state.chat_history,
+                openai_client = OpenAIClient()               
+                response = openai_client.generate_text_response(
+                    selected_model=st.session_state.selected_model,
+                    chat_history=st.session_state.chat_history,
                     temperature=temperature,
                     max_tokens=max_tokens,
                     top_p=top_p,
                     presence_penalty=presence_penalty,
                     frequency_penalty=frequency_penalty
-                )
+                )                    
+
                 answer = response.choices[0].message.content
 
             # Display assistant response
