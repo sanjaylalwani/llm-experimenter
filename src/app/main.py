@@ -67,8 +67,23 @@ if st.session_state.user:
         frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1)
 
     # Model selection
-    openai_models = model_config.get("", [])
-    st.selectbox("Select Generative AI model:", options=openai_models, key="selected_model")
+    # print(model_config)
+    # openai_models = model_config.get("openai", [])
+    # print(f"Available OpenAI models: {openai_models}")
+    # st.selectbox("Select Generative AI model:", options=openai_models, key="selected_model")
+
+    flattened_options = []
+    for provider, model_list in model_config.items():
+        for model in model_list:
+            flattened_options.append(f"{provider}: {model}")
+
+    selected_flat = st.selectbox("Select Model:", flattened_options, key="flat")
+    if selected_flat:
+        provider_name = selected_flat.split(": ")[0]
+        model_name = selected_flat.split(": ")[1]
+        st.write(f"Provider: {provider_name}, Model: {model_name}")
+
+    st.divider()
 
     # Display chat history
     for chat in st.session_state.chat_history:
@@ -88,14 +103,15 @@ if st.session_state.user:
             with st.spinner("Thinking..."):
                 openai_client = OpenAIClient()               
                 response = openai_client.generate_text_response(
-                    selected_model=st.session_state.selected_model,
+                    selected_model=model,
                     chat_history=st.session_state.chat_history,
                     temperature=temperature,
                     max_tokens=max_tokens,
-                    top_p=top_p,
                     presence_penalty=presence_penalty,
                     frequency_penalty=frequency_penalty
-                )                    
+                )  
+
+                print(f"Response from OpenAI: {response}")                  
 
                 answer = response.choices[0].message.content
 

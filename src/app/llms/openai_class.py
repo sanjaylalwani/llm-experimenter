@@ -30,7 +30,7 @@ class OpenAIClient:
                              chat_history: List[Dict],
                              temperature: float = 0.7,
                              max_tokens: int = 1000,
-                             top_p: float = 0.9,
+                            #  top_p: float = 0.9,
                              presence_penalty: float = 0.0,
                              frequency_penalty: float = 0.0,
                              timeout: int = 30) -> Optional[str]:
@@ -78,9 +78,9 @@ class OpenAIClient:
             print(f"Error: max_tokens must be between 1 and 128000, got {max_tokens}")
             return None
             
-        if not (0.0 <= top_p <= 1.0):
-            print(f"Error: top_p must be between 0.0 and 1.0, got {top_p}")
-            return None
+        # if not (0.0 <= top_p <= 1.0):
+        #     print(f"Error: top_p must be between 0.0 and 1.0, got {top_p}")
+        #     return None
             
         if not (-2.0 <= presence_penalty <= 2.0):
             print(f"Error: presence_penalty must be between -2.0 and 2.0, got {presence_penalty}")
@@ -98,7 +98,6 @@ class OpenAIClient:
                 messages=chat_history,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                top_p=top_p,
                 presence_penalty=presence_penalty,
                 frequency_penalty=frequency_penalty,
                 timeout=timeout
