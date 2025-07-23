@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import openai
 
-class OpenAIClient:
+class CLS_OpenAI_Client:
     def __init__(self):
         load_dotenv()
         
@@ -41,8 +41,7 @@ class OpenAIClient:
             selected_model: OpenAI model name (e.g., 'gpt-3.5-turbo', 'gpt-4')
             chat_history: List of message dictionaries with 'role' and 'content'
             temperature: Sampling temperature (0.0-2.0)
-            max_tokens: Maximum tokens to generate (1-4096+)
-            top_p: Nucleus sampling parameter (0.0-1.0)
+            max_tokens: Maximum tokens to generate (1-4096+) 
             presence_penalty: Presence penalty (-2.0 to 2.0)
             frequency_penalty: Frequency penalty (-2.0 to 2.0)
             timeout: Request timeout in seconds

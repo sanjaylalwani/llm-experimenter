@@ -11,7 +11,7 @@ from utils import SessionManager
 from history_manager import HistoryManager
 from user_configuration_manager import get_user_config
 
-from app.llms.openai_class import OpenAIClient
+from app.modelList.openai_class import CLS_OpenAI_Client
                 
 from configurations.settings import Settings
 settings = Settings()
@@ -101,7 +101,7 @@ if st.session_state.user:
         # Call OpenAI API
         try:
             with st.spinner("Thinking..."):
-                openai_client = OpenAIClient()               
+                openai_client = CLS_OpenAI_Client()               
                 response = openai_client.generate_text_response(
                     selected_model=model,
                     chat_history=st.session_state.chat_history,
