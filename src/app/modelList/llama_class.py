@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from groq import Groq
 import groq
 
-class GroqClient:
+class CLS_Groq_Client:
     def __init__(self):
         load_dotenv()
         

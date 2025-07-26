@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-class AnthropicClient:
+class CLS_Anthropic_Client:
     def __init__(self):
         load_dotenv()
         self.client = Anthropic(
@@ -16,9 +16,7 @@ class AnthropicClient:
                             chat_history: List[Dict],                                 
                             temperature: float = 0.7,                                 
                             max_tokens: int = 1000,                                 
-                            top_p: float = 0.9,                                 
-                            presence_penalty: float = 0.0,                                 
-                            frequency_penalty: float = 0.0,
+                            top_p: float = 0.9,  
                             timeout: int = 30) -> Optional[str]:
         """
         Generate text response with comprehensive error handling and validation.
@@ -29,8 +27,6 @@ class AnthropicClient:
             temperature: Sampling temperature (0.0-2.0)
             max_tokens: Maximum tokens to generate
             top_p: Nucleus sampling parameter (0.0-1.0)
-            presence_penalty: Presence penalty (-2.0 to 2.0)
-            frequency_penalty: Frequency penalty (-2.0 to 2.0)
             timeout: Request timeout in seconds
             
         Returns:
@@ -59,13 +55,6 @@ class AnthropicClient:
             print(f"Error: top_p must be between 0.0 and 1.0, got {top_p}")
             return None
             
-        if not (-2.0 <= presence_penalty <= 2.0):
-            print(f"Error: presence_penalty must be between -2.0 and 2.0, got {presence_penalty}")
-            return None
-            
-        if not (-2.0 <= frequency_penalty <= 2.0):
-            print(f"Error: frequency_penalty must be between -2.0 and 2.0, got {frequency_penalty}")
-            return None
         
         start_time = time.time()
         
@@ -76,8 +65,6 @@ class AnthropicClient:
                 max_tokens=max_tokens,
                 temperature=temperature,
                 top_p=top_p,
-                presence_penalty=presence_penalty,
-                frequency_penalty=frequency_penalty,
                 timeout=timeout
             )
             

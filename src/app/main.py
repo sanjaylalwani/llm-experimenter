@@ -12,6 +12,8 @@ from history_manager import HistoryManager
 from user_configuration_manager import get_user_config
 
 from app.modelList.openai_class import CLS_OpenAI_Client
+from app.modelList.anthropic_class import CLS_Anthropic_Client
+from app.modelList.llama_class import CLS_Groq_Client
                 
 from configurations.settings import Settings
 settings = Settings()
@@ -101,29 +103,49 @@ if st.session_state.user:
         # Call OpenAI API
         try:
             with st.spinner("Thinking..."):
-                openai_client = CLS_OpenAI_Client()               
-                response = openai_client.generate_text_response(
-                    selected_model=model,
-                    chat_history=st.session_state.chat_history,
-                    temperature=temperature,
+
+                if provider_name == "openai":
+                    openai_client = CLS_OpenAI_Client()
+                    answer = openai_client.generate_text_response(
+                        selected_model=model_name,
+                        chat_history=st.session_state.chat_history,
+                        temperature=temperature,
                     max_tokens=max_tokens,
                     presence_penalty=presence_penalty,
-                    frequency_penalty=frequency_penalty
-                )  
+                    frequency_penalty=frequency_penalty)
+                    print(f"Response from OpenAI: {answer}")
+                elif provider_name == "anthropic":
+                    anthropic_client = CLS_Anthropic_Client()
+                    answer = anthropic_client.generate_text_response(
+                        selected_model=model_name,
+                        chat_history=st.session_state.chat_history,
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    )
+                    print(f"Response from Anthropic: {answer}")
+                elif provider_name == "llama":
+                    llama_client = CLS_Groq_Client()
+                    answer = llama_client.generate_text_response(
+                        selected_model=model_name,
+                        chat_history=st.session_state.chat_history,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        frequency_penalty=frequency_penalty
+                    )
+                    print(f"Response from Llama: {answer}")
 
-                print(f"Response from OpenAI: {response}")                  
-
-                answer = response.choices[0].message.content
+                # answer = response.choices[0].message.content
 
             # Display assistant response
             st.chat_message("assistant").markdown(answer)
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
+            print
 
             # Save interaction to MongoDB
             history_manager.save_history(
                 user=st.session_state.user,
                 session_id = st.session_state.session_id,
-                model=st.session_state.selected_model,
+                model=model_name,
                 prompt=prompt,
                 response=answer
             )
