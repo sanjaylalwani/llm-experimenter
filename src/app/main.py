@@ -35,7 +35,7 @@ load_dotenv()
 
 # Streamlit Page Config
 st.set_page_config(page_title="LLM Experimenter", layout="centered")
-st.title("🤖 LLM Experimenter – OpenAI Chat")
+st.title("LLM Experimenter")
 
 # Initialize session state
 if "user" not in st.session_state:
@@ -67,12 +67,6 @@ if st.session_state.user:
         top_p = st.slider("Top-p", 0.0, 1.0, user_defaults["top_p"], step=0.05)
         presence_penalty = st.slider("Presence Penalty", -2.0, 2.0, user_defaults["presence_penalty"], step=0.1)
         frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1)
-
-    # Model selection
-    # print(model_config)
-    # openai_models = model_config.get("openai", [])
-    # print(f"Available OpenAI models: {openai_models}")
-    # st.selectbox("Select Generative AI model:", options=openai_models, key="selected_model")
 
     flattened_options = []
     for provider, model_list in model_config.items():

@@ -74,7 +74,7 @@ class CLS_Anthropic_Client:
             if elapsed_time > 10:
                 print(f"Warning: Response took {elapsed_time:.2f} seconds")
             
-            return response.choices[0].message.content
+            return response.content[0].text if response.content else None
             
         except Exception as e:
             elapsed_time = time.time() - start_time
