@@ -1,0 +1,7 @@
+{
+  "user": "sanjay@example.com",
+  "session_id": "12345abcde",
+  "company": "openai",
+  "system_prompt": "Explain LLM in simple terms.",
+  "timestamp": "2025-06-30T20:35:00Z"
+}

@@ -16,6 +16,7 @@ class CLS_Groq_Client:
             raise ValueError("GROQ_API_KEY not found in environment variables")
             
         self.client = Groq(api_key=api_key)
+        print("Groq client initialized with API key")
         
         # Test connection on initialization
         try:
@@ -113,6 +114,7 @@ class CLS_Groq_Client:
                 stop=stop,
                 timeout=timeout
             )
+            print(response)
             
             elapsed_time = time.time() - start_time
             

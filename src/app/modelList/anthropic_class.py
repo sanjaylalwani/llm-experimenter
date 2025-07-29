@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 class CLS_Anthropic_Client:
     def __init__(self):
         load_dotenv()
+        print(os.getenv("ANTHROPIC_API_KEY"))
         self.client = Anthropic(
             api_key=os.getenv("ANTHROPIC_API_KEY"),
         )

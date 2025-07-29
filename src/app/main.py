@@ -97,6 +97,8 @@ if st.session_state.user:
         # Call OpenAI API
         try:
             with st.spinner("Thinking..."):
+                print(f"Selected Model: {model_name}")
+                print(f"Provider: {provider_name}")
 
                 if provider_name == "openai":
                     openai_client = CLS_OpenAI_Client()
