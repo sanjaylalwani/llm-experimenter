@@ -14,7 +14,8 @@ from user_configuration_manager import get_user_config
 from app.modelList.openai_class import CLS_OpenAI_Client
 from app.modelList.anthropic_class import CLS_Anthropic_Client
 from app.modelList.llama_class import CLS_Groq_Client
-                
+from app.modelList.gemini_class import CLS_Gemini_Client
+
 from configurations.settings import Settings
 settings = Settings()
 model_config = settings.model_config
@@ -127,6 +128,15 @@ if st.session_state.user:
                         temperature=temperature,
                         max_tokens=max_tokens,
                         frequency_penalty=frequency_penalty
+                    )
+                    print(f"Response from Llama: {answer}")
+                elif provider_name == "google":
+                    google_client = CLS_Gemini_Client()
+                    answer = google_client.generate_text_response(
+                        selected_model=model_name,
+                        chat_history=st.session_state.chat_history,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
                     )
                     print(f"Response from Llama: {answer}")
 
