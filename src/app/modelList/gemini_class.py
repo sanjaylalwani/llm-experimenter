@@ -41,9 +41,14 @@ class CLS_Gemini_Client:
         Returns:
             Generated text or None if failed
         """
-        print(f"Generating response using model: {chat_history}")
+        prompt = "\n".join([msg["content"] for msg in chat_history])
+        print(f"Generating response using model: {selected_model} with prompt: {prompt}")
         response = self.client.models.generate_content(
-            model=selected_model, 
-            contents=chat_history
+                model=selected_model, 
+                contents=[prompt],
+                config=types.GenerateContentConfig(
+                                temperature=temperature,         # Increase randomness for a more creative story
+                                max_output_tokens=max_tokens,   # Limit the story's length to a reasonable size
+                            ),
         )
         return response.text
