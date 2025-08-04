@@ -82,5 +82,11 @@
     "model": "gpt-4-1106-preview",
     "model_detail": "Preview version of GPT-4 with enhanced performance released on 2023-11-06.",
     "timestamp": "2023-11-06T00:00:00Z"
+  },
+  {
+    "company": "google",
+    "model": "gemini-2.0-flash-001",
+    "model_detail": "Preview version of Gemini 2.0 with enhanced performance released on 2023-11-06.",
+    "timestamp": "2023-11-06T00:00:00Z"
   }
 ]
