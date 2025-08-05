@@ -76,7 +76,8 @@ if st.session_state.user:
 
     if available_models:
         for model in available_models:
-            st.write(f"Available Model: {model}")
+            # st.write(f"Available Model: {model['company']} - {model['model']}")
+            flattened_options.append(f"{model['company']}: {model['model']}")
     else:
         
         model_config = settings.model_config
@@ -155,7 +156,7 @@ if st.session_state.user:
             # Display assistant response
             st.chat_message("assistant").markdown(answer)
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
-            print
+            
 
             # Save interaction to MongoDB
             history_manager.save_history(

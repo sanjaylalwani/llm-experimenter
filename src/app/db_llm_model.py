@@ -22,7 +22,7 @@ class LLM_MODEL_Manager:
 
     def get_models(self, status="Active"):
         try:
-            cursor = self.collection            
+            cursor = self.collection.find()            
             return list(cursor)
         except errors.PyMongoError as e:
             print(f"Failed to retrieve models: {e}")
