@@ -8,7 +8,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import SessionManager
-from history_manager import HistoryManager
+from src.app.db_history_manager import HistoryManager
 from db_llm_model import LLM_MODEL_Manager
 from user_configuration_manager import get_user_config
 
