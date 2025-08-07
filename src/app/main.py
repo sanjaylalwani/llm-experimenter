@@ -8,9 +8,9 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import SessionManager
-from src.app.db_history_manager import HistoryManager
-from db_llm_model import LLM_MODEL_Manager
-from user_configuration_manager import get_user_config
+from app.database.db_history_manager import HistoryManager
+from app.database.db_llm_model import LLM_MODEL_Manager
+from app.database.user_configuration_manager import get_user_config
 
 from app.modelList.openai_class import CLS_OpenAI_Client
 from app.modelList.anthropic_class import CLS_Anthropic_Client
@@ -18,7 +18,6 @@ from app.modelList.llama_class import CLS_Groq_Client
 from app.modelList.gemini_class import CLS_Gemini_Client
 
 from configurations.settings import Settings
-settings = Settings()
 
 
 # Initialize SessionManager
@@ -59,7 +58,7 @@ with st.sidebar:
 
 # App Body
 if st.session_state.user:
-
+    settings = Settings()
     user_defaults = get_user_config(st.session_state.user, fallback=settings.defaults)
 
     with st.expander("⚙️ Advanced Parameters", expanded=False):
