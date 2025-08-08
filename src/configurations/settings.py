@@ -8,16 +8,10 @@ class Settings:
         base_dir = Path(__file__).parent
 
         # Build the full path to your YAML file
-        file_path = base_dir / 'models.yml'
+        file_path = base_dir / 'defaultconfiguration.yml'
         with open(file_path, "r") as f:
             self.model_config =  yaml.safe_load(f)
-        self.defaults = self.model_config.get("defaults", {
-            "temperature": 0.7,
-            "max_tokens": 512,
-            "top_p": 1.0,
-            "presence_penalty": 0.0,
-            "frequency_penalty": 0.0
-        })
+        self.defaults = self.model_config.get("defaults")
 
     def _load_model_config(self):
         if not self.model_config_path.exists():

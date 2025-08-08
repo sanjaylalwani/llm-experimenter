@@ -8,8 +8,9 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from utils import SessionManager
-from history_manager import HistoryManager
-from user_configuration_manager import get_user_config
+from app.database.db_history_manager import HistoryManager
+from app.database.db_llm_model import LLM_MODEL_Manager
+from app.database.user_configuration_manager import get_user_config
 
 from app.modelList.openai_class import CLS_OpenAI_Client
 from app.modelList.anthropic_class import CLS_Anthropic_Client
@@ -17,8 +18,6 @@ from app.modelList.llama_class import CLS_Groq_Client
 from app.modelList.gemini_class import CLS_Gemini_Client
 
 from configurations.settings import Settings
-settings = Settings()
-model_config = settings.model_config
 
 
 # Initialize SessionManager
@@ -59,7 +58,7 @@ with st.sidebar:
 
 # App Body
 if st.session_state.user:
-
+    settings = Settings()
     user_defaults = get_user_config(st.session_state.user, fallback=settings.defaults)
 
     with st.expander("⚙️ Advanced Parameters", expanded=False):
@@ -70,9 +69,20 @@ if st.session_state.user:
         frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1)
 
     flattened_options = []
-    for provider, model_list in model_config.items():
-        for model in model_list:
-            flattened_options.append(f"{provider}: {model}")
+    # Load model configurations
+    llm_model_manager = LLM_MODEL_Manager()
+    available_models = llm_model_manager.get_models()
+
+    if available_models:
+        for model in available_models:
+            # st.write(f"Available Model: {model['company']} - {model['model']}")
+            flattened_options.append(f"{model['company']}: {model['model']}")
+    else:
+        
+        model_config = settings.model_config
+        for provider, model_list in model_config.items():
+            for model in model_list:
+                flattened_options.append(f"{provider}: {model}")
 
     selected_flat = st.selectbox("Select Model:", flattened_options, key="flat")
     if selected_flat:
@@ -145,7 +155,7 @@ if st.session_state.user:
             # Display assistant response
             st.chat_message("assistant").markdown(answer)
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
-            print
+            
 
             # Save interaction to MongoDB
             history_manager.save_history(
