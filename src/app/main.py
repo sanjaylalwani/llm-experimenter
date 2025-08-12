@@ -1,5 +1,8 @@
 import sys
+
+# --- Top bar with New Session (left) and Configure (right) ---
 import streamlit as st
+from streamlit import columns
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -45,7 +48,23 @@ if "chat_history" not in st.session_state:
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = "gpt-3.5-turbo"
 
-# Sidebar Login
+
+
+top_left, top_spacer, top_right = st.columns([2,6,2])
+with top_left:
+    if st.button("New_Session", key="new_session_btn"
+                 ):
+        st.session_state.session_id = session_manager.generate_session_id()
+        st.session_state.chat_history = []
+        st.session_state['show_config'] = False  # Hide config on new session
+        st.success("Started a new session.")
+with top_right:
+    if 'show_config' not in st.session_state:
+        st.session_state['show_config'] = False
+    if st.button("Configure", key="show_config_btn"):
+        st.session_state['show_config'] = not st.session_state['show_config']
+
+# Sidebar: Login and Session History
 with st.sidebar:
     st.subheader("Login")
     user_input = st.text_input("Enter your email or name", value=st.session_state.get("user", ""))
@@ -56,17 +75,37 @@ with st.sidebar:
         else:
             st.warning("Please enter a name or email.")
 
-# App Body
-if st.session_state.user:
+    # Show session history only if user is logged in
+    if st.session_state.get("user"):
+        st.markdown("---")
+        st.subheader("📜 Session History")
+        saved_history = history_manager.get_history(st.session_state.session_id, limit=10)
+        for item in saved_history:
+            st.markdown(f"🕒 `{item['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}` | **{item['model']}**")
+            st.markdown(f"- **Prompt:** {item['prompt']}")
+            st.markdown(f"- **Response:** {item['response']}")
+
+
+# --- Show configuration in main area if toggled ---
+if st.session_state.get('show_config', False) and st.session_state.get("user"):
     settings = Settings()
     user_defaults = get_user_config(st.session_state.user, fallback=settings.defaults)
+    st.markdown("---")
+    st.subheader("⚙️ Advanced Parameters")
+    temperature = st.slider("Temperature", 0.0, 1.0, user_defaults["temperature"], step=0.05, key="sidebar_temperature")
+    max_tokens = st.number_input("Max Tokens", 10, 4096, user_defaults["max_tokens"], step=10, key="sidebar_max_tokens")
+    top_p = st.slider("Top-p", 0.0, 1.0, user_defaults["top_p"], step=0.05, key="sidebar_top_p")
+    presence_penalty = st.slider("Presence Penalty", -2.0, 2.0, user_defaults["presence_penalty"], step=0.1, key="sidebar_presence_penalty")
+    frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1, key="sidebar_frequency_penalty")
 
-    with st.expander("⚙️ Advanced Parameters", expanded=False):
-        temperature = st.slider("Temperature", 0.0, 1.0, user_defaults["temperature"], step=0.05)
-        max_tokens = st.number_input("Max Tokens", 10, 4096, user_defaults["max_tokens"], step=10)
-        top_p = st.slider("Top-p", 0.0, 1.0, user_defaults["top_p"], step=0.05)
-        presence_penalty = st.slider("Presence Penalty", -2.0, 2.0, user_defaults["presence_penalty"], step=0.1)
-        frequency_penalty = st.slider("Frequency Penalty", -2.0, 2.0, user_defaults["frequency_penalty"], step=0.1)
+# App Body (show only if config is not shown)
+if st.session_state.user and not st.session_state.get('show_config', False):
+    # Use sidebar values for parameters
+    temperature = st.session_state.get("sidebar_temperature", 0.7)
+    max_tokens = st.session_state.get("sidebar_max_tokens", 512)
+    top_p = st.session_state.get("sidebar_top_p", 1.0)
+    presence_penalty = st.session_state.get("sidebar_presence_penalty", 0.0)
+    frequency_penalty = st.session_state.get("sidebar_frequency_penalty", 0.0)
 
     flattened_options = []
     # Load model configurations
@@ -75,10 +114,8 @@ if st.session_state.user:
 
     if available_models:
         for model in available_models:
-            # st.write(f"Available Model: {model['company']} - {model['model']}")
             flattened_options.append(f"{model['company']}: {model['model']}")
     else:
-        
         model_config = settings.model_config
         for provider, model_list in model_config.items():
             for model in model_list:
@@ -117,9 +154,9 @@ if st.session_state.user:
                         selected_model=model_name,
                         chat_history=st.session_state.chat_history,
                         temperature=temperature,
-                    max_tokens=max_tokens,
-                    presence_penalty=presence_penalty,
-                    frequency_penalty=frequency_penalty)
+                        max_tokens=max_tokens,
+                        presence_penalty=presence_penalty,
+                        frequency_penalty=frequency_penalty)
                     print(f"Response from OpenAI: {answer}")
                 elif provider_name == "anthropic":
                     anthropic_client = CLS_Anthropic_Client()
@@ -150,17 +187,14 @@ if st.session_state.user:
                     )
                     print(f"Response from Llama: {answer}")
 
-                # answer = response.choices[0].message.content
-
             # Display assistant response
             st.chat_message("assistant").markdown(answer)
             st.session_state.chat_history.append({"role": "assistant", "content": answer})
-            
 
             # Save interaction to MongoDB
             history_manager.save_history(
                 user=st.session_state.user,
-                session_id = st.session_state.session_id,
+                session_id=st.session_state.session_id,
                 model=model_name,
                 prompt=prompt,
                 response=answer
@@ -168,13 +202,5 @@ if st.session_state.user:
 
         except Exception as e:
             st.error(f"Error: {e}")
-
-    # Show past saved interactions
-    with st.expander("📜 View Previous 10 Interactions"):
-        saved_history = history_manager.get_history(st.session_state.user, limit=10)
-        for item in saved_history:
-            st.markdown(f"🕒 `{item['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}` | **{item['model']}**")
-            st.markdown(f"- **Prompt:** {item['prompt']}")
-            st.markdown(f"- **Response:** {item['response']}")
-else:
+elif not st.session_state.get('show_config', False):
     st.info("Please login using the sidebar to start chatting.")
